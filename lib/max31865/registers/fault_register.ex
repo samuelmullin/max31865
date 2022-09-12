@@ -18,7 +18,7 @@ defmodule Max31865.Registers.FaultRegister do
 
   ## Clearing Faults
 
-  Faults are cleared by setting the Fault Clear bit in the [ConfigRegister](`Max31865.Registers.ConfigRegister`).
+  Faults are cleared by setting the Fault Clear bit in the [ConfigRegister](`Max31865.Registers.ConfigRegister`).  This can be done using [Max31865.clear_faults/1](`Max31865.clear_faults/1`)
 
   """
   alias Circuits.SPI

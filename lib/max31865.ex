@@ -12,4 +12,9 @@ defmodule Max31865 do
     Returns the resistance of the connected RTD.  Accepts a Server name (in case multiple Max31865 modules are connected), but defaults to the module name if none is set.
   """
   defdelegate get_resistance(server_name \\ Max31865.Server), to: Max31865.Server
+
+  @doc"""
+  Returns the resistance of the connected RTD.  Accepts a Server name (in case multiple Max31865 modules are connected), but defaults to the module name if none is set.
+  """
+  defdelegate clear_faults(server_name \\ Max31865.Server), to: Max31865.Server
 end

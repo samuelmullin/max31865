@@ -45,14 +45,30 @@ defmodule Max31865.Server do
     GenServer.start_link(__MODULE__, config, name: name)
   end
 
-  @doc """
-    Returns the temperature in degrees celcius.  The result is calculated mathematically using the formula found in the datasheet:
-    https://datasheets.maximintegrated.com/en/ds/MAX31865.pdf
-
+  @doc"""
+  Returns the temperature in degrees celcius.  The result is calculated mathematically using the formula found in the datasheet:
+  https://datasheets.maximintegrated.com/en/ds/MAX31865.pdf
   """
   def get_temp(name \\ __MODULE__), do: GenServer.call(name, :get_temp)
+
+  @doc"""
+  Returns the resistance calculated from the RTD.
+  """
   def get_resistance(name \\ __MODULE__), do: GenServer.call(name, :get_resistance)
-  def get_config(name \\ __MODULE__), do: GenServer.call(name, :read_config_register)
+
+  @doc"""
+  Returns a [Config Register](`Max31865.Registers.ConfigRegister`) struct with the current contents of the register.
+  """
+  def get_config(name \\ __MODULE__), do: GenServer.call(name, :get_config)
+
+  @doc"""
+  Clears any faults set in the [Fault Register](`Max31865.Registers.FaultRegister`).
+  """
+  def clear_faults(name \\ __MODULE__), do: GenServer.call(name, :clear_fault_register)
+
+  @doc"""
+  Returns the reference to the SPI connection that was opened for this Server.
+  """
   def get_max_ref(name \\ __MODULE__), do: GenServer.call(name, :get_max_ref)
 
   @impl true
@@ -84,7 +100,7 @@ defmodule Max31865.Server do
   end
 
   @impl true
-  def handle_call(:read_config_register, _from, server) do
+  def handle_call(:get_config, _from, server) do
     response = ConfigRegister.read(server.max_ref)
     {:reply, response, server}
   end
@@ -94,6 +110,15 @@ defmodule Max31865.Server do
     resistance = Conversions.get_resistance(server)
 
     {:reply, resistance, server}
+  end
+
+  @impl true
+  def handle_cast(:clear_fault_register, server) do
+    ConfigRegister.read(server.max_ref)
+    |> struct([fault_clear: 1])
+    |> ConfigRegister.write(server.max_ref)
+
+    {:noreply, server}
   end
 
   defp server_to_register(%__MODULE__{} = server) do
