@@ -1,13 +1,26 @@
 defmodule Max31865.Conversions do
+  @moduledoc"""
+  Contains logic for performing and obtaining the results of Conversions.
+  """
 
   alias Max31865.Server
   alias Max31865.Registers.{ConfigRegister, RTDResistanceRegister}
 
+  @doc"""
+  Returns the current temperature of the RTD in degrees celcius.
+
+  If auto_convert mode is enabled, this will be the result of the last conversion.  If it is disabled, a one-shot conversion will be performed and the result of that conversion will be returned.
+  """
   def get_temp(%Server{} = server) do
     get_resistance(server)
     |> temperature_from_resistance(server.rtd_nominal)
   end
 
+  @doc"""
+  Returns the current resistance value for the RTD.
+
+  If auto_convert mode is enabled, this will be the result of the last conversion.  If it is disabled, a one-shot conversion will be performed and the result of that conversion will be returned.
+  """
   def get_resistance(%Server{} = server) do
     get_raw_reading(server.auto_convert, server.max_ref)
     |> resistance_from_reading(server.ref_resistor)
