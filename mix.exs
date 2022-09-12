@@ -9,6 +9,7 @@ defmodule Max31865.MixProject do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      docs: docs(),
       package: package()
     ]
   end
@@ -25,6 +26,17 @@ defmodule Max31865.MixProject do
     [
       {:circuits_spi, "~> 1.3"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      main: Max31865,
+      extras: [
+        "README.md": [
+          title: "Readme"
+        ]
+      ]
     ]
   end
 

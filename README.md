@@ -23,12 +23,12 @@ defp deps do
 
 ## Usage
 
-Start the application, passing in any required config.  The will allow for one-shot conversions using Spidev0.0 with a PT100 connected with either 2 or 4 wires.
+Start the server, passing in any required config.  The will allow for one-shot conversions using Spidev0.0 on a raspberry pi with a PT100 connected with either 2 or 4 wires.
 
 ```elixir
   def application do
     [
-      {Max31865, [rtd_wires: 3, spi_device_cs_pin: 1]}
+      {Max3186.Server, [rtd_wires: 3, spi_device_cs_pin: 1]}
       extra_applications: [:logger]
     ]
   end
