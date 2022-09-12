@@ -1,6 +1,8 @@
 defmodule Max31865.Registers.FaultRegister do
   @moduledoc """
 
+  Allows the reading of the Max31865 Fault Register.
+
   ## Register Layout
 
   The fault register for the MAX31865 consists of 8 bits.  Only the first 6 are used. From left to right:

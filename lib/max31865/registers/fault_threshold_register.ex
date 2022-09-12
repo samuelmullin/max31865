@@ -1,6 +1,8 @@
 defmodule Max31865.Registers.FaultThresholdRegister do
   @moduledoc """
 
+  Allows the reading and writing of the Max31865 Fault Threshold Register.
+
   ## Register Layout
 
   Each fault threshold register consists of 16-bits of data which represent an integer.  That integer is used to determine if a reading is higher or lower than is allowed.any()

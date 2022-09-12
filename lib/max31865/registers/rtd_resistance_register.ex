@@ -1,6 +1,9 @@
 defmodule Max31865.Registers.RTDResistanceRegister do
   @moduledoc """
-  The config register for the MAX31865 consists of 8 bits, from left to right.  The first four are settings:
+
+  Allows the reading of the Max31865 RTD Resistance Register.
+
+  ## Register Layout
 
   - The first 15 bits represent the ratio of RTD resistance to reference resistance
   - The 16th bit is the Fault bit: 0 if no faults were detected, 1 if faults were detected.

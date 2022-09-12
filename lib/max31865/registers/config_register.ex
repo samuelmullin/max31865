@@ -1,6 +1,8 @@
 defmodule Max31865.Registers.ConfigRegister do
   @moduledoc """
 
+  Allows the reading and writing of the Max31865 Config Register.
+
   ## Register Layout
 
   The config register for the MAX31865 consists of 8 bits, from left to right:
