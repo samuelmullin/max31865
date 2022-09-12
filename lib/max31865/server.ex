@@ -7,13 +7,18 @@ defmodule Max31865.Server do
 
 
   @moduledoc """
-  Driver for the MAX31865 thermocouple amplifier for use on a Raspberry Pi.  Tested with the Raspberry Pi Zero W V 1.2.  Should work similarly with other Raspberry PI devices.
+  Server to interact with Max31865 connected via SPI.
 
-  rtd_nominal: The expected resistance of the RTD at 0 degrees C
-  ref_resistor: The resistance of the reference resistor.  Defaults to 430.0 for use with the PT100.  Set to 4300.0 for the PT1000.
-  spi_device: The SPI device being used. Defaults to 0.
-  spi_device_cs_pin: The CS pin for the SPI device being used.  Defaults to 0.
-  rtd_wires: Whether 3 wire mode should be enabled.  Defaults to false for use in 2/4 wire mode.  Set to true for use in 3 wire mode.
+  ## Config options
+
+  - rtd_nominal: The expected resistance of the RTD at 0 degrees C.  Typically 100.
+  - ref_resistor: The resistance of the reference resistor.  Defaults to 430.0 for use with the PT100.  Set to 4300.0 for the PT1000.
+  - spi_device: The SPI device being used. Defaults to 0.
+  - spi_device_cs_pin: The CS pin for the SPI device being used.  Defaults to 0.
+  - rtd_wires: Whether 3 wire mode should be enabled.  Defaults to false for use in 2/4 wire mode.  Set to true for use in 3 wire mode.
+  - auto_convert:  Whether auto-conversion mode should be used - if true, the module will constantly measure resistance.  This introduces self heating as it requires the VBias to be enabled constantly, so unless you have a particular need for it, using one shot measurements is recommended.
+  - filter_select_mode: Determines whether to filter for 50hz or 60hz noise from the mains.  If you live in North America, the default (60) will work.
+
   """
 
   defstruct rtd_nominal: 100,
