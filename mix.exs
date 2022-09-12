@@ -6,8 +6,10 @@ defmodule Max31865.MixProject do
       app: :max31865_module,
       version: "0.1.0",
       elixir: "~> 1.13",
+      build_embedded: Mix.env == :prod,
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -22,6 +24,16 @@ defmodule Max31865.MixProject do
   defp deps do
     [
       {:circuits_spi, "~> 1.3"}
+    ]
+  end
+
+  defp package do
+    [
+      name: "max31865",
+      description:
+        "A driver for working with the Max31865 RTD amplifier and a PT100 or PT1000.  Still a WIP but probably perfectly fine for most hobbyist needs.",
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => "https://github.com/samuelmullin/max31865"}
     ]
   end
 end
