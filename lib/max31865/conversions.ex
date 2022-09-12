@@ -58,6 +58,8 @@ defmodule Max31865.Conversions do
     |> apply_alternative_formula(resistance, rtd_nominal)
   end
 
+  # Formula interpretation largely lifted from the adafruit implementation: https://github.com/adafruit/Adafruit_MAX31865/blob/master/Adafruit_MAX31865.cpp
+  # If you want more detail check the datasheet: https://datasheets.maximintegrated.com/en/ds/MAX31865.pdf
   defp apply_primary_formula(resistance, rtd_nominal) do
     rtd_a = 3.9083e-3
     rtd_b = -5.775e-7
