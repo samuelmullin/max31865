@@ -23,7 +23,7 @@ defp deps do
 
 ## Usage
 
-Start the server, passing in any required config.  The will allow for one-shot conversions using Spidev0.0 on a raspberry pi with a PT100 connected with either 2 or 4 wires.
+Start the server, passing in any required config.  The will allow for one-shot conversions using Spidev0.0 on a raspberry pi with a PT100 connected with either 2 or 4 wires.  For more information on configuration options, please see the [Server module](`Max31865.Server`).
 
 ```elixir
   def application do
