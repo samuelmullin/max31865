@@ -3,7 +3,7 @@ defmodule Max31865.MixProject do
 
   def project do
     [
-      app: :max31865_module,
+      app: :max31865,
       version: "0.1.0",
       elixir: "~> 1.13",
       build_embedded: Mix.env == :prod,
@@ -23,7 +23,8 @@ defmodule Max31865.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:circuits_spi, "~> 1.3"}
+      {:circuits_spi, "~> 1.3"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
