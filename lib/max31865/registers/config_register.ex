@@ -1,17 +1,51 @@
 defmodule Max31865.Registers.ConfigRegister do
   @moduledoc """
-  The config register for the MAX31865 consists of 8 bits, from left to right.  The first four are settings:
 
-  - VBias 1: on, 0: off.  This introduces self-heating so it should be disabled when we are not actively reading.  Must be enabled if Conversion mode is set to auto.
-  - Conversion Mode 1: Auto, 0: Normally off.   When set to auto, readings will be continuously performed at a rate based on the 50/60Hz filter select.
-  - 1Shot mode:  1: on, 0: off (Auto clears after setting 1).  Takes a single reading and resets itself to 0 afterwards.
-  - 3 Wire mode:  1: 3 Wire RTD, 0: 2 or 4 Wire RTD.  Should be set to one if the connected RTD uses 3 wires, otherwise set to 0.
-  - Fault Detection Cycle Control 1 of 2 (see below)
-  - Fault Detection Cycle Control 2 of 2 (see below)
-  - Fault Status Clear: 1: Clear, 0: Don't Clear (Auto clears after setting 1).  Clears the fault status and resets itself to 0 afterwards.
-  - 50/60Hz Filter Select:  1: 50Hz, 0: 60Hz. Set based on the mains AC frequency for your country.
+  ## Register Layout
+
+  The config register for the MAX31865 consists of 8 bits, from left to right:
+
+  |Vbias|AutoMode|OneShotMode|ThreeWireMode|FaultCycle1|FaultCycle2|Fault Clear|Filter Select|
+  |-----|---------|-----------|------|-------------|-------------|-----------|-------------|
+
+  |Name           |R/W |Behaviour                                                      |
+  |---------------|----|---------------------------------------------------------------|
+  |Vbias          |R/W | Enables/Disables Vbias.  Vbias introduces self heating so it should be disabled when not actively performing conversions.|
+  |AutoMode       |R/W | When enabled, conversions will be performed constantly even if they are not being read.  Vbias *must* be enabled if auto mode is enabled.|
+  |OneShotMode    |R/W | When enabled a single conversion is performed, after which the bit is automatically cleared.|
+  |ThreeWireMode  |R/W | When enabled, three wire mode is used.  Otherwise, 2/4 wire mode is used.|
+  |FaultCycle1    |R   | Used to determine fault cycle status.  See below for further detail.|
+  |FaultCycle2    |R   | Used to determine fault cycle status.  See below for further detail.|
+  |FaultClear     |R/W | When enabled, any faults will be cleared, after which the bit is automatically cleared.|
+  |FilterSelect   |R/W | Used to filter out mains noise.  When enabled, 50hz mode is used.  Otherwise, 60hz mode is used.|
+
+
+  ## Fault Cycle Status Bits
+
+  The Fault Cycle bits can be written to in order to trigger a fault detection with either an automatic or manual delay.  In the case of a manual delay, fault detection continues until the user requests that it ends.
+
+  The Fault Cycle bits can be read to determine the status of the Fault Cycle.  Note that these bits do not report faults.  For that, see the FaultRegister.
+
+  ### Writing to Fault Cycle Bits
+
+  |Bit 1|Bit 2|Meaning                                             |
+  |-----|-----|----------------------------------------------------|
+  |0    |0    |N/A|
+  |1    |0    |Begin Fault detection with Automatic completion|
+  |0    |1    |Begin Fault detection with Manual completion|
+  |1    |1    |End Fault detection with Manual completion|
+
+  ### Reading from Fault Cycle Bits
+
+  |Bit 1|Bit 2|Meaning                                             |
+  |-----|-----|----------------------------------------------------|
+  |0    |0    |Fault detection finished|
+  |1    |0    |Automatic fault detection still running|
+  |0    |1    |Manual cycle 1 still running; waiting for user to write 11|
+  |1    |1    |Manual cycle 2 still running|
+
   """
-  require Logger
+
   alias Circuits.SPI
 
   @read_register <<0x00>>
@@ -27,9 +61,23 @@ defmodule Max31865.Registers.ConfigRegister do
             fault_clear: 0,
             filter_select: 0
 
-  def bits(options) do
-    config = struct(__MODULE__, options)
+  @doc"""
+  Accepts a Max31865 SPI reference and reads the Config Register, then returns a ConfigRegister struct representing it's contents.
+  """
+  def read(max_ref) do
+    {:ok, <<@read_register, bits>>} = SPI.transfer(max_ref, <<@read_register::binary, 0x00>>)
+    to_struct(<<bits>>)
+  end
 
+  @doc"""
+  Accepts a ConfigRegister struct and a Max31865 SPI reference and writes it to the ConfigRegister.
+  """
+  def write(%__MODULE__{} = config, max_ref) do
+    {:ok, response} = SPI.transfer(max_ref, <<@write_register::binary, to_bits(config)::binary>>)
+    response
+  end
+
+  defp to_bits(%__MODULE__{} = config) do
     <<
       config.vbias::1,
       config.conversion_mode::1,
@@ -42,7 +90,7 @@ defmodule Max31865.Registers.ConfigRegister do
     >>
   end
 
-  def to_struct(bits) do
+  defp to_struct(<<_::size(8)>> = bits) do
       <<
         vbias::size(1),
         conversion_mode::size(1),
@@ -64,24 +112,6 @@ defmodule Max31865.Registers.ConfigRegister do
         fault_clear: fault_clear,
         filter_select: filter_select
       ])
-  end
-
-  def read(max_ref) do
-    {:ok, <<@read_register, bits>>} = SPI.transfer(max_ref, <<@read_register::binary, 0x00>>)
-    to_struct(<<bits>>)
-  end
-
-  def write(%__MODULE__{} = config, max_ref) do
-    Logger.info("Config in write: #{inspect(config)}")
-    new_config_bits =
-      config
-      |> Map.from_struct()
-      |> bits()
-
-      Logger.info("Bits in write: #{inspect(new_config_bits)}")
-
-    {:ok, response} = SPI.transfer(max_ref, <<@write_register::binary, new_config_bits::binary>>)
-    response
   end
 
 end

@@ -1,33 +1,52 @@
 defmodule Max31865.Registers.FaultThresholdRegister do
+  @moduledoc """
 
+  ## Register Layout
+
+  Each fault threshold register consists of 16-bits of data which represent an integer.  That integer is used to determine if a reading is higher or lower than is allowed.any()
+
+  The default state for the low registers is 0, the default state for the high registers is 65,535.
+  """
   alias Circuits.SPI
 
-  @msb_high_fault_threshold_read_register <<0x03>>
-  @lsb_high_fault_threshold_read_register <<0x04>>
-  @msb_low_fault_threshold_read_register <<0x05>>
-  @lsb_low_fault_threshold_read_register <<0x06>>
-  @msb_high_fault_threshold_write_register <<0x83>>
-  @lsb_high_fault_threshold_write_register <<0x84>>
-  @msb_low_fault_threshold_write_register <<0x85>>
-  @lsb_low_fault_threshold_write_register <<0x86>>
+  @high_fault_threshold_read_register <<0x03>>
+  @low_fault_threshold_read_register <<0x05>>
+  @high_fault_threshold_write_register <<0x83>>
+  @low_fault_threshold_write_register <<0x85>>
 
+  @doc"""
+  Read a fault threshold register.
 
-  def read(:msb, :high, max_ref), do: read(@msb_high_fault_threshold_read_register, max_ref)
-  def read(:lsb, :high, max_ref), do: read(@lsb_high_fault_threshold_read_register, max_ref)
-  def read(:msb, :low, max_ref), do: read(@msb_low_fault_threshold_read_register, max_ref)
-  def read(:lsb, :low, max_ref), do: read(@lsb_low_fault_threshold_read_register, max_ref)
+  Parameters:
 
-  defp read(register, max_ref) do
+    - `:high`/`:low` which signify whether the register contains the high threshold or low threshold
+    - `:max_ref` which is a reference to a Max31865 SPI Connection
+
+    Returns a tuple of `{:ok, threshold}` where threshold integer representing the current value the requested register.
+  """
+  def read(:high, max_ref), do: read_register(@high_fault_threshold_read_register, max_ref)
+  def read(:low, max_ref), do: read_register(@low_fault_threshold_read_register, max_ref)
+
+  defp read_register(register, max_ref) do
     {:ok, <<0x00, threshold::size(16)>>} = SPI.transfer(max_ref, <<register::binary, 0x00, 0x00>>)
     {:ok, threshold}
   end
 
-  def write(:msb, :high, threshold, max_ref), do: write(@msb_high_fault_threshold_write_register, threshold, max_ref)
-  def write(:lsb, :high, threshold, max_ref), do: write(@lsb_high_fault_threshold_write_register, threshold, max_ref)
-  def write(:msb, :low, threshold, max_ref), do: write(@msb_low_fault_threshold_write_register, threshold, max_ref)
-  def write(:lsb, :low, threshold, max_ref), do: write(@lsb_low_fault_threshold_write_register, threshold, max_ref)
+  @doc"""
+  Write to a fault threshold register.
 
-  defp write(register, threshold, max_ref) do
+  Paramaters:
+
+    - `:high`/`:low` which signify whether the register contains the high threshold or low threshold
+    - An integer representing the new threshold
+    - `:max_ref` which is a reference to a Max31865 SPI Connection
+
+    Returns a tuple of `{:ok, value}` where value is the new threshold written to the requested register.
+  """
+  def write(:high, threshold, max_ref), do: write_register(@high_fault_threshold_write_register, threshold, max_ref)
+  def write(:low, threshold, max_ref), do: write_register(@low_fault_threshold_write_register, threshold, max_ref)
+
+  defp write_register(register, threshold, max_ref) do
     threshold = encode_threshold(threshold)
     {:ok, <<0x00, 0x00, 0x00>>} = SPI.transfer(max_ref, <<register::binary, threshold::binary>>)
     {:ok, threshold}

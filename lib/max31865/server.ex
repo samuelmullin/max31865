@@ -1,6 +1,5 @@
 defmodule Max31865.Server do
   use GenServer
-  require Logger
 
   alias Circuits.SPI
   alias Max31865.Conversions

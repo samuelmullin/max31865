@@ -31,7 +31,7 @@ defmodule Max31865.MixProject do
 
   defp docs do
     [
-      main: Max31865,
+      main: "Readme",
       extras: [
         "README.md": [
           title: "Readme"

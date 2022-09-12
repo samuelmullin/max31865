@@ -1,5 +1,24 @@
 defmodule Max31865.Registers.FaultRegister do
+  @moduledoc """
 
+  ## Register Layout
+
+  The fault register for the MAX31865 consists of 8 bits.  Only the first 6 are used. From left to right:
+
+  |RTDHighThreshold|RTDLowThreshold|RefInLow|RefInHigh|RTDInLow|OverUnderVoltage|
+  |----------------|---------------|--------|---------|--------|----------------|
+
+  When read back, each bit that returns true represents a fault that was detected.
+
+  ## Investigating Faults
+
+  The cause of a fault bit will vary depending on how many wires you are using to connect your RTD.  More information on troubleshooting can be found in the [data sheet](https://datasheets.maximintegrated.com/en/ds/MAX31865.pdf) on pages 22-23
+
+  ## Clearing Faults
+
+  Faults are cleared by setting the Fault Clear bit in the [ConfigRegister](`Max31865.Registers.ConfigRegister`).
+
+  """
   alias Circuits.SPI
 
   @read_register <<0x07>>
